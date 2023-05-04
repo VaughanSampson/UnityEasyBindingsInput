@@ -9,27 +9,44 @@ namespace PlayerInputBindings
         [SerializeField] private InputActionReference selectedAction;
         [SerializeField] private PlayerInput playerInput;
 
+        /// <summary>
+        /// Method <c>SelectActionMap</c> will switch action maps by string
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
         public bool SelectActionMap(string str)
         {
             playerInput.SwitchCurrentActionMap(str);
             return true;
         }
 
+        /// <summary>
+        /// Method <c>SelectAction</c> will select an action for rebinding
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
         public bool SelectAction(string str)
         {
             this.selectedAction.Set(playerInput.currentActionMap.FindAction(str));
             return true;
         }
 
-
+        // Variables for performing an interactive rebinding
         private InputActionRebindingExtensions.RebindingOperation rebindingOperation;
         private bool doingInteractiveRebind = false;
         public bool DoingInteractiveRebind { get { return doingInteractiveRebind; } }
+        /// <summary>
+        /// Method <c>PerformInteractiveRebind</c> will take the players next input to bind that to
+        /// selected action.
+        /// </summary>
+        /// <param name="controlsExcluding"></param>
+        /// <returns></returns>
         public bool PerformInteractiveRebind(string controlsExcluding = "")
         {
             if (selectedAction == null || selectedAction.ToInputAction() == null)
             {
-                Debug.LogWarning("Cannot PerformInteractiveRebind if there is no selected action. Select an action with SelectAction(InputActionReference).");
+                Debug.LogWarning("Cannot PerformInteractiveRebind if there is no selected action. " +
+                    "Select an action with SelectAction(InputActionReference).");
                 return false;
             }
 
@@ -49,18 +66,24 @@ namespace PlayerInputBindings
 
             rebindingOperation = selectedAction.action.PerformInteractiveRebinding()
                 .OnMatchWaitForAnother(0.1f)
-                .OnComplete(operation => PerformInteractiveRebindComplete())
-                .Start();
+                .OnComplete(operation => {
+                    rebindingOperation.Dispose();
+                    doingInteractiveRebind = false; 
+                }).Start();
             
             return true;
         }
 
-        private void PerformInteractiveRebindComplete()
-        {
-            rebindingOperation.Dispose();
-            doingInteractiveRebind = false;
-        }
-
 
     }
+
+
+
+    // TO BE IMPLEMENTED NEXT
+    /*
+     * Functionality for multiple keys.
+     * Functionality for special bindings, e.g. composite.
+     * Saving and loading of bindngs.'
+     * 
+     */
 }
