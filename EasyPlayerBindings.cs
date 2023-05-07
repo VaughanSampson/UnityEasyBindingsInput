@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 
 namespace PlayerInputBindings
 {
-    public class EasyBindingsInput
+    public class EasyPlayerBindings
     {
 
         [SerializeField] private InputActionReference selectedAction;
@@ -16,10 +16,10 @@ namespace PlayerInputBindings
         public bool DoingInteractiveRebind { get { return doingInteractiveRebind; } }
 
         /// <summary>
-        /// Constructor method <c>EasyBindingsInput</c> initialises an EasyBindingsInput object.
+        /// Constructor method <c>EasyPlayerBindings</c> initialises an EasyPlayerBindings object.
         /// </summary>
         /// <param name="playerInput"></param>
-        public EasyBindingsInput(PlayerInput playerInput)
+        public EasyPlayerBindings(PlayerInput playerInput)
         {
             this.playerInput = playerInput;
         }
