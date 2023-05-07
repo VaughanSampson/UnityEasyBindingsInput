@@ -1,8 +1,9 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace PlayerInputBindings
+namespace EasyPlayerBindings
 {
+    [System.Serializable]
     public class EasyPlayerBindings
     {
 
@@ -11,7 +12,7 @@ namespace PlayerInputBindings
 
 
         // Variables for performing an interactive rebinding
-        private InputActionRebindingExtensions.RebindingOperation rebindingOperation;
+        private InputActionRebindingExtensions.RebindingOperation rebindOperation;
         private bool doingInteractiveRebind = false;
         public bool DoingInteractiveRebind { get { return doingInteractiveRebind; } }
 
@@ -22,68 +23,118 @@ namespace PlayerInputBindings
         public EasyPlayerBindings(PlayerInput playerInput)
         {
             this.playerInput = playerInput;
+            this.selectedAction = ScriptableObject.CreateInstance<InputActionReference>();
         }
 
         /// <summary>
-        /// Method <c>SelectActionMap</c> will switch action maps by string
+        /// Method <c>SelectActionMap</c> will select the <c>PlayerInput</c> class's current action map
+        /// by its string name as long as it is defined in the <c>PlayerInput</c> class's current <c>Input
+        /// Action Asset</c>.
         /// </summary>
-        /// <param name="str"></param>
+        /// <param name="actionMapName"></param>
         /// <returns></returns>
-        public bool SelectActionMap(string str)
+        public void SelectActionMap(string actionMapName)
         {
-            playerInput.SwitchCurrentActionMap(str);
-            return true;
+            playerInput.SwitchCurrentActionMap(actionMapName);
         }
 
         /// <summary>
         /// Method <c>SelectAction</c> will select an action for rebinding
         /// </summary>
-        /// <param name="str"></param>
+        /// <param name="actionName"></param>
         /// <returns></returns>
-        public bool SelectAction(string str)
-        {
-            this.selectedAction.Set(playerInput.currentActionMap.FindAction(str));
-            return true;
+        public void SelectAction(string actionName)
+        { 
+            this.selectedAction.Set(playerInput.currentActionMap.FindAction(actionName));
         }
 
+
         /// <summary>
-        /// Method <c>PerformInteractiveRebind</c> will take the players next input to bind that to
-        /// selected action.
+        /// Predicate <c>CanDoInteractiveRebind</c> returns true if this object has enough 
+        /// information to perform and interactive rebind; otherwise, false.
         /// </summary>
-        /// <param name="controlsExcluding"></param>
         /// <returns></returns>
-        public bool PerformInteractiveRebind(string controlsExcluding = "")
+        private bool CanDoInteractiveRebind()
         {
+
             if (selectedAction == null || selectedAction.ToInputAction() == null)
             {
-                Debug.LogWarning("Cannot PerformInteractiveRebind if there is no selected action. " +
+                Debug.LogWarning("Cannot InteractiveRebind if there is no selected action. " +
                     "Select an action with SelectAction(InputActionReference).");
                 return false;
             }
-
-            if(doingInteractiveRebind)
+            else
+            if (doingInteractiveRebind)
             {
-                Debug.LogWarning("Cannot PerformInteractiveRebind more than once simultaneously.");
+                Debug.LogWarning("Cannot InteractiveRebind more than once simultaneously.");
                 return false;
-            }
+            } 
 
-            if (playerInput.currentActionMap == selectedAction.ToInputAction().actionMap)
-            {
-                Debug.LogWarning("Cannot PerformInteractiveRebind on currently active ActionMap");
-                return false;
-            }
+            return true;
+
+        }
+
+        /// <summary>
+        /// Method <c>InteractiveRebind</c> will take the player's next keyboard/mouse/controller/etc... input and bind
+        /// it to the selected action. Select an action with <c>InteractiveRebind.SelectAction(string actionName)</c>
+        /// </summary>
+        /// <returns></returns>
+        public void InteractiveRebind(string controlsExcluding = "")
+        {
+            if (!CanDoInteractiveRebind())
+                return;
+             
+            doingInteractiveRebind = true;
+
+            playerInput.currentActionMap.Disable();
+
+            rebindOperation = selectedAction.action.PerformInteractiveRebinding();
+            if (controlsExcluding != "")
+                rebindOperation.WithControlsExcluding(controlsExcluding);
+            rebindOperation.OnMatchWaitForAnother(0.1f);
+            rebindOperation.OnComplete(operation => {
+                rebindOperation.Dispose();
+                doingInteractiveRebind = false;
+                playerInput.currentActionMap.Enable();
+            }).Start(); 
+        }
+        
+        public void InteractiveRebindCompositeElement(string compositeName, string partName)
+        {
+
+            if (!CanDoInteractiveRebind())
+                return;
 
             doingInteractiveRebind = true;
 
-            rebindingOperation = selectedAction.action
-                .PerformInteractiveRebinding()
-                .OnMatchWaitForAnother(0.1f)
-                .OnComplete(operation => {
-                    rebindingOperation.Dispose();
-                    doingInteractiveRebind = false; 
-                }).Start();
-            
-            return true;
+            playerInput.currentActionMap.Disable();
+
+            rebindOperation = selectedAction.action.PerformInteractiveRebinding(); 
+
+            var bindingIndex = selectedAction.action.bindings.IndexOf(x => x.isPartOfComposite && x.name.ToLower() == partName.ToLower());
+
+            InteractiveRebindCompositeAtIndex(bindingIndex);
+        }
+
+
+
+        private void InteractiveRebindCompositeAtIndex(int index)
+        {
+            if (index < 1)
+            {
+                Debug.LogError("Attempted to rebind to index below zero.");
+                return;
+            }
+
+            rebindOperation.WithTargetBinding(index);
+
+
+            rebindOperation.OnMatchWaitForAnother(0.1f);
+            rebindOperation.OnComplete(operation => {
+                rebindOperation.Dispose();
+                doingInteractiveRebind = false;
+                playerInput.currentActionMap.Enable();
+            }).Start();
         }
 
 
