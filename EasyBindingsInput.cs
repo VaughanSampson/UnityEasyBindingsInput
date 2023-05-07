@@ -3,11 +3,26 @@ using UnityEngine.InputSystem;
 
 namespace PlayerInputBindings
 {
-    public class PlayerInputBindings : MonoBehaviour
+    public class EasyBindingsInput
     {
 
         [SerializeField] private InputActionReference selectedAction;
         [SerializeField] private PlayerInput playerInput;
+
+
+        // Variables for performing an interactive rebinding
+        private InputActionRebindingExtensions.RebindingOperation rebindingOperation;
+        private bool doingInteractiveRebind = false;
+        public bool DoingInteractiveRebind { get { return doingInteractiveRebind; } }
+
+        /// <summary>
+        /// Constructor method <c>EasyBindingsInput</c> initialises an EasyBindingsInput object.
+        /// </summary>
+        /// <param name="playerInput"></param>
+        public EasyBindingsInput(PlayerInput playerInput)
+        {
+            this.playerInput = playerInput;
+        }
 
         /// <summary>
         /// Method <c>SelectActionMap</c> will switch action maps by string
@@ -31,10 +46,6 @@ namespace PlayerInputBindings
             return true;
         }
 
-        // Variables for performing an interactive rebinding
-        private InputActionRebindingExtensions.RebindingOperation rebindingOperation;
-        private bool doingInteractiveRebind = false;
-        public bool DoingInteractiveRebind { get { return doingInteractiveRebind; } }
         /// <summary>
         /// Method <c>PerformInteractiveRebind</c> will take the players next input to bind that to
         /// selected action.
@@ -64,7 +75,8 @@ namespace PlayerInputBindings
 
             doingInteractiveRebind = true;
 
-            rebindingOperation = selectedAction.action.PerformInteractiveRebinding()
+            rebindingOperation = selectedAction.action
+                .PerformInteractiveRebinding()
                 .OnMatchWaitForAnother(0.1f)
                 .OnComplete(operation => {
                     rebindingOperation.Dispose();
