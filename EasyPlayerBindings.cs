@@ -2,9 +2,8 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace EasyPlayerBindings
+namespace EPBindings
 {
-    [System.Serializable]
     public class EasyPlayerBindings
     {
          
@@ -36,6 +35,14 @@ namespace EasyPlayerBindings
             actionMap = playerInput.actions.FindActionMap(actionMapName); 
         }
          
+        /// <summary>
+        /// This predicate is used to check if an interactive rebinding is already occurring.
+        /// </summary>
+        /// <returns></returns>
+        public bool IsDoingInteractiveRebind()
+        {
+            return doingInteractiveRebind;
+        }
 
         /// <summary>
         /// This predicate is checked to avoid some errors when doing an interactive rebind.
