@@ -77,7 +77,7 @@ namespace EasyPlayerBindings
         public void InteractiveRebind(string actionName, int index = 0, string controlsExcluding = "")
         { 
             InputActionReference selectedAction = ScriptableObject.CreateInstance<InputActionReference>();
-            selectedAction.Set(playerInput.currentActionMap.FindAction(actionName));
+            selectedAction.Set(actionMap.FindAction(actionName));
             InteractiveRebind(selectedAction, index, controlsExcluding);
 
         }
@@ -94,7 +94,7 @@ namespace EasyPlayerBindings
                 return;
 
             doingInteractiveRebind = true;
-            playerInput.currentActionMap.Disable();
+            actionMap.Disable();
 
             rebindOperation = selectedAction.action.PerformInteractiveRebinding();
 
@@ -134,7 +134,7 @@ namespace EasyPlayerBindings
         public void CancelInteractiveRebind() => rebindOperation.Cancel();
 
         /// <summary>
-        /// 
+        /// This is called to cleanup leftover reminents of an interactive rebinding.
         /// </summary>
         private void InteractiveRebindClosed()
         { 
@@ -143,13 +143,29 @@ namespace EasyPlayerBindings
             playerInput.currentActionMap.Enable();
         }
 
+        /// <summary>
+        /// This "SaveRebinds" saves rebind information to player prefs.
+        /// </summary>
+        /// <param name="saveTitle">The title used to save rebinds more uniquely.</param>
+        public void SaveRebinds(string saveTitle = "actions")
+        {
+            string rebinds = playerInput.actions.SaveBindingOverridesAsJson(); 
+            PlayerPrefs.SetString(saveTitle + "_rebinds", rebinds);
+        }
+
+        /// <summary>
+        /// This "SaveRebinds" loads rebind information from player prefs.
+        /// </summary>
+        /// <param name="saveTitle">The title used to save rebinds more uniquely.</param>
+        public void LoadRebinds(string saveTitle = "actions")
+        {
+            string rebinds = PlayerPrefs.GetString(saveTitle + "_rebinds", string.Empty);
+            if (string.IsNullOrEmpty(rebinds)) { return; }
+            playerInput.actions.LoadBindingOverridesFromJson(rebinds);
+        }
 
     }
 
 
 
-    // TO BE IMPLEMENTED NEXT
-    /*
-     * Saving and loading of bindngs.'
-     */
 }
