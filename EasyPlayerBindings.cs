@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -6,8 +7,7 @@ namespace EasyPlayerBindings
     [System.Serializable]
     public class EasyPlayerBindings
     {
-
-        [SerializeField] private InputActionReference selectedAction;
+         
         [SerializeField] private PlayerInput playerInput;
 
 
@@ -23,7 +23,6 @@ namespace EasyPlayerBindings
         public EasyPlayerBindings(PlayerInput playerInput)
         {
             this.playerInput = playerInput;
-            this.selectedAction = ScriptableObject.CreateInstance<InputActionReference>();
         }
 
         /// <summary>
@@ -37,24 +36,14 @@ namespace EasyPlayerBindings
         {
             playerInput.SwitchCurrentActionMap(actionMapName);
         }
-
-        /// <summary>
-        /// Method <c>SelectAction</c> will select an action for rebinding
-        /// </summary>
-        /// <param name="actionName"></param>
-        /// <returns></returns>
-        public void SelectAction(string actionName)
-        { 
-            this.selectedAction.Set(playerInput.currentActionMap.FindAction(actionName));
-        }
-
+         
 
         /// <summary>
         /// Predicate <c>CanDoInteractiveRebind</c> returns true if this object has enough 
         /// information to perform and interactive rebind; otherwise, false.
         /// </summary>
         /// <returns></returns>
-        private bool CanDoInteractiveRebind()
+        private bool CanDoInteractiveRebind(InputActionReference selectedAction)
         {
 
             if (selectedAction == null || selectedAction.ToInputAction() == null)
@@ -74,67 +63,55 @@ namespace EasyPlayerBindings
 
         }
 
-        /// <summary>
-        /// Method <c>InteractiveRebind</c> will take the player's next keyboard/mouse/controller/etc... input and bind
-        /// it to the selected action. Select an action with <c>InteractiveRebind.SelectAction(string actionName)</c>
-        /// </summary>
-        /// <returns></returns>
-        public void InteractiveRebind(string controlsExcluding = "")
-        {
-            if (!CanDoInteractiveRebind())
-                return;
-             
-            doingInteractiveRebind = true;
+        public void InteractiveRebind(string actionName, int index = 0, string controlsExcluding = "")
+        { 
+            InputActionReference selectedAction = ScriptableObject.CreateInstance<InputActionReference>();
+            selectedAction.Set(playerInput.currentActionMap.FindAction(actionName));
+            InteractiveRebind(selectedAction, index, controlsExcluding);
 
+        }
+
+        public void InteractiveRebind(InputActionReference selectedAction, int index = 0, string controlsExcluding = "")
+        { 
+            if (!CanDoInteractiveRebind(selectedAction))
+                return;
+
+            doingInteractiveRebind = true;
             playerInput.currentActionMap.Disable();
 
             rebindOperation = selectedAction.action.PerformInteractiveRebinding();
+
             if (controlsExcluding != "")
                 rebindOperation.WithControlsExcluding(controlsExcluding);
-            rebindOperation.OnMatchWaitForAnother(0.1f);
-            rebindOperation.OnComplete(operation => {
-                rebindOperation.Dispose();
-                doingInteractiveRebind = false;
-                playerInput.currentActionMap.Enable();
-            }).Start(); 
-        }
-        
-        public void InteractiveRebindCompositeElement(string compositeName, string partName)
-        {
-
-            if (!CanDoInteractiveRebind())
-                return;
-
-            doingInteractiveRebind = true;
-
-            playerInput.currentActionMap.Disable();
-
-            rebindOperation = selectedAction.action.PerformInteractiveRebinding(); 
-
-            var bindingIndex = selectedAction.action.bindings.IndexOf(x => x.isPartOfComposite && x.name.ToLower() == partName.ToLower());
-
-            InteractiveRebindCompositeAtIndex(bindingIndex);
-        }
-
-
-
-        private void InteractiveRebindCompositeAtIndex(int index)
-        {
-            if (index < 1)
-            {
-                Debug.LogError("Attempted to rebind to index below zero.");
-                return;
-            }
 
             rebindOperation.WithTargetBinding(index);
 
-
             rebindOperation.OnMatchWaitForAnother(0.1f);
-            rebindOperation.OnComplete(operation => {
-                rebindOperation.Dispose();
-                doingInteractiveRebind = false;
-                playerInput.currentActionMap.Enable();
-            }).Start();
+            rebindOperation.OnComplete(operation => InteractiveRebindClosed());
+            rebindOperation.OnCancel(operation => InteractiveRebindClosed());
+
+            rebindOperation.Start();
+
+        }
+
+        public void InteractiveRebind(string actionName, string compositePartName, string controlsExcluding = "")
+        {
+            InputActionReference selectedAction = ScriptableObject.CreateInstance<InputActionReference>();
+            selectedAction.Set(playerInput.currentActionMap.FindAction(actionName));
+
+            var bindingIndex = selectedAction.action.bindings.IndexOf(x => x.isPartOfComposite && x.name.ToLower() == compositePartName.ToLower()); 
+
+            InteractiveRebind(selectedAction, bindingIndex, controlsExcluding);
+
+        }
+
+        public void CancelInteractiveRebind() => rebindOperation.Cancel(); 
+
+        private void InteractiveRebindClosed()
+        { 
+            rebindOperation.Dispose();
+            doingInteractiveRebind = false;
+            playerInput.currentActionMap.Enable();
         }
 
 
@@ -144,9 +121,6 @@ namespace EasyPlayerBindings
 
     // TO BE IMPLEMENTED NEXT
     /*
-     * Functionality for multiple keys.
-     * Functionality for special bindings, e.g. composite.
      * Saving and loading of bindngs.'
-     * 
      */
 }
