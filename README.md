@@ -2,8 +2,8 @@
 `UnityEasyPlayerBindings` will streamline the process of managing the controller bindings of Unity's [PlayerInput](https://docs.unity3d.com/Packages/com.unity.inputsystem@1.0/api/UnityEngine.InputSystem.PlayerInput.html) class. Varieties of setting, saving and loading rebindings are condensed into single line functions for easy use across any game projects.
 
 ### This class supports:
-+ Interactive rebinding of action controls.
-+ Interactive rebinding of composite controls.
++ Easy interactive rebinding of basic action controls.
++ Easy interactive rebinding of composite action controls.
 + Saving and loading of customized controls.
 
 ## Setup
@@ -29,7 +29,7 @@ public class PlayerInputController : MonoBehaviour
 }
 ``` 
 
-Now methods within this class are called to control user input bindings. 
+Methods within this initialized object can be called to control user input bindings. 
 
 ### Later implementations will support:
 + Setting bindings non-interactively.
