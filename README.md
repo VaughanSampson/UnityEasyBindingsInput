@@ -29,8 +29,14 @@ public class PlayerInputController : MonoBehaviour
 }
 ``` 
 
-## Methods within an initialized UnityEasyPlayerBindings object should be called to change, save and load user input bindings. 
+## Using UnityEasyPlayerBindings
+The following Action Map will be used for examples.
+![Capture](https://github.com/VaughanSampson/UnityEasyPlayerBindings/assets/128713660/69ad5751-7e3d-4a3b-9ff9-8fc3588eed84)
+
+### Basic Rebind to Action
+
  
+
 
 
 
