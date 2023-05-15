@@ -30,14 +30,30 @@ public class PlayerInputController : MonoBehaviour
 ``` 
 
 ## Using UnityEasyPlayerBindings
-The following Action Map will be used for examples.
+The following action map will be used for examples.
 
-![Capture](https://github.com/VaughanSampson/UnityEasyPlayerBindings/assets/128713660/69ad5751-7e3d-4a3b-9ff9-8fc3588eed84)
+![Capture](https://github.com/VaughanSampson/UnityEasyPlayerBindings/assets/128713660/e96056e9-0b29-4e35-abf1-a7351c16332f)
+
+### Set Action Map
+The action map with the action being changed must be made current to do any rebindings.
+```
+SelectActionMap(string actionMapName)
+```
+Example:
+```
+SelectActionMap("Sample")
+```
 
 ### Basic Rebind to Action
+Use the following to rebind an action which has only one binding. E.g. to rebind "Dive" in the example action map image.
 ```
 RebindTo(string actionName, string newBindingPath)
 ```
+Example:
+```
+RebindTo("Dive", "<Keyboard>/#(g)")
+```
+Use the following to rebind an action which has only one binding. E.g. to rebind "Dive" in the example action map image.
  
 
 
