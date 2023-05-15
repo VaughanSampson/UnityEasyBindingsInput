@@ -1,18 +1,18 @@
 # UnityEasyPlayerBindings
-The `EasyPlayerBindings` C# script allows easy management of player input bindings in Unity. This tool is specifically designed to simplify the binding customization features of Unity's [PlayerInput](https://docs.unity3d.com/Packages/com.unity.inputsystem@1.0/api/UnityEngine.InputSystem.PlayerInput.html) class.
+`UnityEasyPlayerBindings` will streamline the process of managing the controller bindings of Unity's [PlayerInput](https://docs.unity3d.com/Packages/com.unity.inputsystem@1.0/api/UnityEngine.InputSystem.PlayerInput.html) class. Varieties of setting, saving and loading rebindings are condensed into single line functions for easy use across any game projects.
 
 ### This class supports:
-+ Interactive rebinding of individual binds within actions.
-+ Interactive rebinding of composite binds.
-+ Saving and loading bindings.
++ Easy interactive rebinding of basic action controls.
++ Easy interactive rebinding of composite action controls.
++ Saving and loading of customized controls.
 
 ## Setup
-Download the EasyPlayerBindings.cs file. This has all the code inside of it. Move this into your Unity project's Asset folder wherever is will be kept. Now, any cs file can acess this class through the `EPBindings` namespace. To do this, put `using EPBindings;` at the top of the cs file.
+To begin using EasyPlayerBindings in Unity, have the EasyPlayerBindings.cs file into your Unity project's Asset folder. Now any C# script in your project can access this class through the `EPBindings` namespace. To do this, put `using EPBindings;` at the top of the accessing C# file.
 
 ## Usage
-An `EasyPlayerBindings` object should be instantiate and referenced by some other object which will not be destroyed randomly. For example, a `PlayerInputController` class or a `GameController` class. 
+In an input managing script, an EasyPlayerBindings object can be referenced and instantiated.
 
-Instantiation example:
+Like:
 ```
 using UnityEngine;
 using EPBindings;
@@ -29,6 +29,7 @@ public class PlayerInputController : MonoBehaviour
 }
 ``` 
 
+Methods within this initialized object can be called to control user input bindings. 
 
 ### Later implementations will support:
 + Setting bindings non-interactively.
