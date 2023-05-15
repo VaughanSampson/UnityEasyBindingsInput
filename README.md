@@ -1,18 +1,18 @@
 # UnityEasyPlayerBindings
-`UnityEasyPlayerBindings` simplifies the managing the user bindings for Unity's [PlayerInput](https://docs.unity3d.com/Packages/com.unity.inputsystem@1.0/api/UnityEngine.InputSystem.PlayerInput.html) class. Forms of setting, saving and loading rebindings are condensed into single line functions for easy use across any game projects.
+There is a surprisingly little amount of clear documentation on Unity's standard [PlayerInput](https://docs.unity3d.com/Packages/com.unity.inputsystem@1.0/api/UnityEngine.InputSystem.PlayerInput.html) systems. For some, especially newer programmers, creating basic rebinding code for this unneccesarily complicated input standard would be a wasteful time sink. So `UnityEasyPlayerBindings` simplifies access to the most common and desirable control rebinding features for video game projects. 
 
-### This class supports:
-+ Easy interactive rebinding of action controls.
-+ Easy direct rebinging of action controls.
-+ Saving and loading of customized controls.
+With this class, you can use simple single-line methods to:
++ Rebind controls. This includes rebinding specific bindings within an action or composite action.
++ Initiate an interactive rebind. Here the user's next input will be bound to a desired input binding.
++ Save and load all bindings. 
 
 ## Setup
-To begin using EasyPlayerBindings in Unity, have the EasyPlayerBindings.cs file into your Unity project's Asset folder. Now any C# script in your project can access this class through the `EPBindings` namespace. For this, put `using EPBindings;` at the top of the an accessing C# script.
+To begin using EasyPlayerBindings in Unity, put the EasyPlayerBindings.cs file in your Unity project's Asset folder. Now pick/create a class which manages player input. This class should:
+1. Import the class with `using EPBindings;`.
+2. Have access to the PlayerInput class which will be effected.
+3. Instantiate and store a reference to an `EasyPlayerBindings` object.
 
-## Usage
-In an input managing script, an `EasyPlayerBindings` object can be referenced and instantiated.
-
-Like:
+For example:
 ```
 using UnityEngine;
 using EPBindings;
