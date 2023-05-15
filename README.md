@@ -35,7 +35,9 @@ The following Action Map will be used for examples.
 ![Capture](https://github.com/VaughanSampson/UnityEasyPlayerBindings/assets/128713660/69ad5751-7e3d-4a3b-9ff9-8fc3588eed84)
 
 ### Basic Rebind to Action
-```RebindTo(string actionName, string newBindingPath)```
+```
+RebindTo(string actionName, string newBindingPath)
+```
  
 
 
