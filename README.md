@@ -29,8 +29,8 @@ public class PlayerInputController : MonoBehaviour
 }
 ``` 
 
-## Methods within an initialized UnityEasyPlayerBindings object can be called to control user input bindings. 
-
+## Methods within an initialized UnityEasyPlayerBindings object should be called to change, save and load user input bindings. 
+ 
 
 
 
