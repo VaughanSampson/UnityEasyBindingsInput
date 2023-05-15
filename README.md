@@ -44,7 +44,7 @@ Example:
 SelectActionMap("Sample")
 ```
 Note: This will make the given ActionMap current and active in the `PlayerInput` component. If this is not wanted, simply call the function again with a different  action map name after the rebind is complete.
-
+<br><br><br><br>
 
 ### Basic Rebind to Action
 Use the following to rebind to a non-composite action **which has only one binding**. E.g. to rebind "Dive" in the example image.
