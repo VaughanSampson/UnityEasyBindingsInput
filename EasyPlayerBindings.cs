@@ -1,6 +1,9 @@
 using System;
+using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Utilities; 
 
 namespace EPBindings
 {
@@ -24,8 +27,7 @@ namespace EPBindings
         }
 
         /// <summary>
-        /// This selects an <c>ActionMap</c> from the <c>PlayerInput</c> class and makes it the current map. 
-        /// This is neccessary for rebinding actions from this map.
+        /// This selects an <c>ActionMap</c> from the <c>PlayerInput</c> to make this action map the subject of rebindings.
         /// </summary>
         /// <param name="actionMapName">The name of the selected action map.</param>
         public void SelectActionMap(string actionMapName)
@@ -124,13 +126,15 @@ namespace EPBindings
         public void InteractiveCompositeRebind(string actionName, string compositeName, string compositeBindingName, string controlsExcluding = "")
         {
             InputActionReference selectedAction = ScriptableObject.CreateInstance<InputActionReference>();
-            selectedAction.Set(playerInput.currentActionMap.FindAction(actionName));
+            selectedAction.Set(actionMap.FindAction(actionName));
 
             int bindingIndex = FindCompositeBindingPartIndex(selectedAction, compositeName, compositeBindingName);
 
             InteractiveRebind(selectedAction, bindingIndex, controlsExcluding);
 
         }
+
+        private bool actionMapOfInteractiveRebindIsCurrentActionMap;
 
         /// <summary>
         /// This method does an interactive rebinding to a given action reference, at a given id.
@@ -144,7 +148,9 @@ namespace EPBindings
                 return;
 
             doingInteractiveRebind = true;
-            actionMap.Disable();
+
+            actionMapOfInteractiveRebindIsCurrentActionMap = playerInput.currentActionMap == actionMap;
+            if(actionMapOfInteractiveRebindIsCurrentActionMap) actionMap.Disable();
 
             rebindOperation = action.action.PerformInteractiveRebinding();
 
@@ -168,16 +174,21 @@ namespace EPBindings
         {
             rebindOperation.Cancel();
             InteractiveRebindClosed(); 
-         } 
+         }
+
+        private event Action<InputAction> OnInteractiveRebindClosed;
 
         /// <summary>
         /// This is called to cleanup after an interactive rebinding.
         /// </summary>
         private void InteractiveRebindClosed()
-        {
+        { 
+            OnInteractiveRebindClosed?.Invoke(rebindOperation.action);
+            
             rebindOperation.Dispose();
             doingInteractiveRebind = false;
-            playerInput.currentActionMap.Enable();
+            if (actionMapOfInteractiveRebindIsCurrentActionMap) actionMap.Enable();
+            actionMapOfInteractiveRebindIsCurrentActionMap = false;
         }
          
         /// <summary>
@@ -236,8 +247,7 @@ namespace EPBindings
         {
             InputBinding binding = action.action.bindings[bindingIndex];
             binding.overridePath = newBindingPath;
-            action.action.ApplyBindingOverride(bindingIndex, binding);
-
+            action.action.ApplyBindingOverride(bindingIndex, binding); 
         } 
 
 
@@ -261,6 +271,58 @@ namespace EPBindings
             if (string.IsNullOrEmpty(rebinds)) { return; }
             playerInput.actions.LoadBindingOverridesFromJson(rebinds);
         }
+
+        // To get the binding path of the next user input, the  following code:
+        // creates a temporary action map (not an asset),
+        // adds an action to this map (not an asset),
+        // performs an interactive rebind to that action,
+        // reads the new binding path of said action.
+
+        // Needless to say this is ineffecient but given that Unity currently provides no easy alternative solutions to this problem
+        // and that recalling a rebinding input in most use-cases will occur only rarely (most games don't have to handle excessive continuous run-time rebindings),
+        // this system is functionally effective.
+
+        // There are more effecient solutions on forums which concentrate on rebinding to a specific physical interface, for example,
+        // solely for mouse or for controller. This code alternatively will return any input which can be bound to a Unity InputAction.
+
+        private Action<string> callbackNextInput; 
+        private bool doingGetNextInput; 
+        private InputActionRebindingExtensions.RebindingOperation getNextInputPathRebindOperation;
+
+        /// <summary>
+        /// This will get the path of the next input and send it to the given function.
+        /// </summary>
+        /// <param name="controlsExcluding"></param>
+        public void GetNextInput(Action<string> callback, string controlsExcluding = "")
+        {
+            if (doingGetNextInput)
+                return;
+            doingGetNextInput = true;
+
+            callbackNextInput = callback;
+
+            InputActionMap getInputActionMap = new InputActionMap();
+            getInputActionMap.AddAction("GetKey");
+            getInputActionMap.actions[0].AddBinding("");
+            getNextInputPathRebindOperation = getInputActionMap.actions[0].PerformInteractiveRebinding();
+
+            if (controlsExcluding != "")
+                getNextInputPathRebindOperation.WithControlsExcluding(controlsExcluding); 
+
+            getNextInputPathRebindOperation.WithTargetBinding(0);
+
+            getNextInputPathRebindOperation.OnMatchWaitForAnother(0.1f);
+            getNextInputPathRebindOperation.OnComplete(operation => GetNextInputClosed()); 
+            getNextInputPathRebindOperation.Start();
+        }
+  
+        private void GetNextInputClosed()
+        {
+            callbackNextInput(getNextInputPathRebindOperation.action.bindings[0].overridePath); 
+            getNextInputPathRebindOperation.Dispose();
+            doingGetNextInput = false; 
+        }
+         
 
     }
 
