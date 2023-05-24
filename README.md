@@ -81,13 +81,11 @@ Example: Binding the 'Move' action's 'RightAndLeftSec' 'Negative' binding to 'g'
 ```
 RebindToComposite("Move", "RightAndLeftSec", "Negative", "<Keyboard>/#(g)")
 ```
-
 Note: strings passed are case-insensitive, given inconsistency in backend Unity naming conventions.
+<br><br>
  
 
 
 
 
-
-### Later implementations will support:
-+ UI supportive features for doing interactive rebindings.
+ 
