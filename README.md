@@ -12,7 +12,7 @@ With this class, you can use simple single-line methods to:
 ## Setup
 To begin using EasyPlayerBindings in Unity, place the EasyPlayerBindings.cs file somewhere in your Unity project's Asset folder. Now pick/create a class which manages player input. This class should:
 1. Import with `using EPBindings;`.
-2. Access the main PlayerInput class.
+2. have a reference to the effected PlayerInput class.
 3. Instantiate and store an `EasyPlayerBindings` object.
 
 
