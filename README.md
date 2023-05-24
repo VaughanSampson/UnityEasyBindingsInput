@@ -40,53 +40,49 @@ The following action map will be used for examples.
 ![Capture](https://github.com/VaughanSampson/UnityEasyPlayerBindings/assets/128713660/e96056e9-0b29-4e35-abf1-a7351c16332f)
 
 ### Set Action Map
-To change any action, an action map must be selected.
+To change any action, its parent action map must be selected.
 ```
 SelectActionMap(string actionMapName)
 ```
 Example:
 ```
 easyPlayerBindings.SelectActionMap("Sample")
-```
-Note: This will make the given ActionMap current and active in the `PlayerInput` component. If this is not wanted, simply call the function again with a different  action map name after the rebind is complete.
-<br>
+``` 
+<br> 
 
-
-### Basic Rebind to Action
-Use the following to rebind to a non-composite action **which has only one binding**. E.g. to rebind "Dive" in the example image.
+### Rebinds with a binding path.
+To rebind the first/only binding of a non-composite action:
 ```
 RebindTo(string actionName, string newBindingPath)
 ```
-Example: Setting the 'Dive' action's single binding to 'g'.
+Example: Binding the 'Dive' action's only binding to 'g'.
 ```
-RebindTo("Dive", "<Keyboard>/#(g)")
+easyPlayerBindings.RebindTo("Dive", "<Keyboard>/#(g)")
 ```
 <br><br>
 
 
-Use the following to rebind to a non-composite action **which multiple bindings**. E.g. to rebind "Jump" in the example image.
+To rebind the _nth_ binding of a non-composite action:
 ```
 RebindTo(string actionName, int bindingIndex, string newBindingPath)
 ```
-Example: Setting the 'Jump' action's second binding to 'g'.
+Example: Binding the 'Jump' action's second binding to 'g'.
 ```
 RebindTo("Dive", 1, "<Keyboard>/#(g)")
 ```
 <br><br>
 
 
-Use the following to rebind to a composite action. E.g. to rebind "Move" in the example image.
+To rebind the labeled binding of a composite action:
 ```
 RebindToComposite(string actionName, string compositeName, string compositeBindingName, string newBindingPath)
-```
-Here you will specify the action name (e.g. 'Move'), the name of composite binding set (e.g. 'RightAndLeft'), and the name of the specific binding (e.g. 'Positive').
-
-Example: Setting the 'Move' action's 'RightAndLeftSec' 'Negative' binding to 'g'.
+``` 
+Example: Binding the 'Move' action's 'RightAndLeftSec' 'Negative' binding to 'g'.
 ```
 RebindToComposite("Move", "RightAndLeftSec", "Negative", "<Keyboard>/#(g)")
 ```
 
-Note: The composite commands are case-insensitive, given inconsistency in Unity backend naming conventions.
+Note: strings passed are case-insensitive, given inconsistency in backend Unity naming conventions.
  
 
 
