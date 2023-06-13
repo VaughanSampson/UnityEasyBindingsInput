@@ -44,7 +44,7 @@ To change any action, its parent action map must be selected.
 ```
 SelectActionMap(string actionMapName)
 ```
-Example:
+Example: Set action map to the map called "Sample."
 ```
 easyPlayerBindings.SelectActionMap("Sample")
 ``` 
@@ -83,9 +83,15 @@ easyPlayerBindings.RebindTo("Dive", "<Keyboard>/#(g)")
 <br><br>
 
 
- 
-
-
+### Rebinds with Interactive Rebind
+To do an interactive rebind to an action under a certain name at an index.
+```
+InteractiveRebind(string actionName, int actionBindingIndex = 0, string controlsExcluding = "")
+```
+Example: Assign the next pressed non-keyboard control to the 2nd index under the Move key.
+```
+easyPlayerBindings.InteractiveRebind("Move",2,"<keyboard>/anyKey")
+``` 
 
 
  
