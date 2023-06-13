@@ -1,18 +1,18 @@
 # UnityEasyPlayerBindings
-There is a surprisingly little amount of clear documentation on Unity's standard [PlayerInput](https://docs.unity3d.com/Packages/com.unity.inputsystem@1.0/api/UnityEngine.InputSystem.PlayerInput.html) functionality. For some programmers, creating basic rebinding code for this input standard is time sink. This package (`UnityEasyPlayerBindings`) streamlines functionality of the most common and desirable control rebinding features for video game projects. 
+There is not much clear documentation on Unity's standard [PlayerInput](https://docs.unity3d.com/Packages/com.unity.inputsystem@1.0/api/UnityEngine.InputSystem.PlayerInput.html) in terms of rebinding keys. This script (`UnityEasyPlayerBindings`) streamlines functionality of the most common and desirable control rebinding features for unity projects.
 
-With this class, you can use simple single-line methods to:
-+ Rebind controls. That is: rebind specific bindings within an action or composite action.
-+ Initiate an interactive rebind where the user's next input will be bound to a desired input binding.
+With the script, you can use simple single-line methods to:
++ Rebind controls, including to specific bindings within an action or a composite action.
++ Initiate an interactive rebind where the user's next input control will be bound to a desired binding.
 + Get the users next input as a string binding path.
 + Set a binding by binding path.
 + Save and load all bindings. 
 
 
 ## Setup
-To begin using EasyPlayerBindings in Unity, place the EasyPlayerBindings.cs file somewhere in your Unity project's Asset folder. Now pick/create a class which manages player input. This class should:
+To begin using EasyPlayerBindings in Unity, place the EasyPlayerBindings.cs file somewhere in your Unity project's Asset folder. Now pick/create your class which manages player input. This class should:
 1. Import with `using EPBindings;`.
-2. have a reference to the effected PlayerInput class.
+2. have a reference to the PlayerInput instance.
 3. Instantiate and store an `EasyPlayerBindings` object.
 
 
@@ -51,16 +51,6 @@ easyPlayerBindings.SelectActionMap("Sample")
 <br> 
 
 ### Rebinds with a binding path.
-To rebind the first/only binding of a non-composite action:
-```
-RebindTo(string actionName, string newBindingPath)
-```
-Example: Binding the 'Dive' action's only binding to 'g'.
-```
-easyPlayerBindings.RebindTo("Dive", "<Keyboard>/#(g)")
-```
-<br><br>
-
 
 To rebind the _nth_ binding of a non-composite action:
 ```
@@ -72,7 +62,6 @@ RebindTo("Dive", 1, "<Keyboard>/#(g)")
 ```
 <br><br>
 
-
 To rebind the labeled binding of a composite action:
 ```
 RebindToComposite(string actionName, string compositeName, string compositeBindingName, string newBindingPath)
@@ -81,8 +70,19 @@ Example: Binding the 'Move' action's 'RightAndLeftSec' 'Negative' binding to 'g'
 ```
 RebindToComposite("Move", "RightAndLeftSec", "Negative", "<Keyboard>/#(g)")
 ```
-Note: strings passed are case-insensitive, given inconsistency in backend Unity naming conventions.
 <br><br>
+
+To rebind the first/only binding of a non-composite action:
+```
+RebindTo(string actionName, string newBindingPath)
+```
+Example: Binding the 'Dive' action's only binding to 'g'.
+```
+easyPlayerBindings.RebindTo("Dive", "<Keyboard>/#(g)")
+```
+<br><br>
+
+
  
 
 
